@@ -220,6 +220,30 @@ export function useGame(_gameId?: string) {
   );
 
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Remote action drain — apply any queued online actions through the engine
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!engineLoaded || !engineRef.current || !state) return;
+    const pending = useGameStore.getState().drainRemoteActions();
+    if (pending.length === 0) return;
+    let s = state;
+    for (const action of pending) {
+      try {
+        s = engineRef.current.applyAction(s, action);
+      } catch (err) {
+        console.error('[useGame] remote applyAction error', err);
+      }
+    }
+    // Check terminal after applying remote actions
+    if (engineRef.current.isTerminal(s)) {
+      const winners = engineRef.current.getWinners(s);
+      s = { ...s, status: 'finished' as const, winners };
+    }
+    _setState(s);
+  }, [state, engineLoaded, _setState]);
+
+  // ---------------------------------------------------------------------------
   // Bot turns — fire whenever it becomes a bot's turn
   // ---------------------------------------------------------------------------
   useEffect(() => {

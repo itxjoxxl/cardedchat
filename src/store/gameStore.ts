@@ -8,6 +8,8 @@ interface GameStore {
   isOnline: boolean;
   roomCode: string | null;
   botDifficulty: BotDifficulty;
+  /** Queue of incoming remote actions waiting to be processed by the engine in useGame */
+  pendingRemoteActions: GameAction[];
   // Actions
   startGame(
     gameId: GameId,
@@ -16,6 +18,10 @@ interface GameStore {
     seed?: number
   ): void;
   applyAction(action: GameAction): void;
+  /** Enqueue a remote action to be applied by the engine once it is loaded */
+  queueRemoteAction(action: GameAction): void;
+  /** Drain and return all queued remote actions, clearing the queue */
+  drainRemoteActions(): GameAction[];
   setOnlineMode(roomCode: string): void;
   endGame(): void;
   setBotDifficulty(d: BotDifficulty): void;
@@ -29,6 +35,7 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   isOnline: false,
   roomCode: null,
   botDifficulty: 'medium',
+  pendingRemoteActions: [],
 
   startGame(
     gameId: GameId,
@@ -57,11 +64,18 @@ export const useGameStore = create<GameStore>()((set, get) => ({
   },
 
   applyAction(_action: GameAction) {
-    // The useGame hook owns the engine reducer call.
-    // This method exists as a hook point for the online path so that
-    // incoming remote actions can be routed here; useGame subscribes to
-    // state changes and picks up new actions via its own doAction.
-    // No-op in the store itself — useGame calls _setState directly.
+    // Kept for API compatibility — use queueRemoteAction for incoming online actions.
+  },
+
+  queueRemoteAction(action: GameAction) {
+    set((s) => ({ pendingRemoteActions: [...s.pendingRemoteActions, action] }));
+  },
+
+  drainRemoteActions() {
+    const actions = get().pendingRemoteActions;
+    if (actions.length === 0) return [];
+    set({ pendingRemoteActions: [] });
+    return actions;
   },
 
   setOnlineMode(roomCode: string) {

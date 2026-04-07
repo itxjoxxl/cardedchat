@@ -46,7 +46,7 @@ export default function GinRummyBoard({ gameId }: BoardProps) {
       <div className="flex flex-col items-center pt-20 gap-2">
         <Avatar emoji={opponent?.avatar ?? '🤖'} name={opponent?.name} size="sm" isCurrentTurn={state.currentPlayerIndex === state.players.indexOf(opponent!)} />
         <div className="flex gap-1">
-          {oppHand.slice(0, 10).map((c: any, i: number) => (
+          {oppHand.map((c: any, i: number) => (
             <Card key={c.id ?? i} card={c} faceUp={phase === 'knock' || phase === 'ended'} size="sm" />
           ))}
         </div>

@@ -56,7 +56,7 @@ export default function TexasHoldemBoard({ gameId }: BoardProps) {
 
         {/* Opponent seats */}
         <div className="absolute top-16 left-0 right-0 flex justify-around px-4">
-          {opponents.slice(0, 3).map((opp: any, i: number) => {
+          {opponents.map((opp: any, i: number) => {
             const oppHoldemPlayer = holdemPlayers.find((p: any) => p.playerId === opp.id);
             const oppHand = oppHoldemPlayer?.holeCards ?? [];
             const isCurrent = state.currentPlayerIndex === state.players.indexOf(opp);

@@ -77,7 +77,7 @@ export default function HeartsBoard({ gameId }: BoardProps) {
 
       {/* Opponents (top area) */}
       <div className="flex justify-around pt-20 pb-2 px-4">
-        {opponents.slice(0, 3).map((opp: any) => {
+        {opponents.map((opp: any) => {
           const oppHand = hearts.hands?.[opp.id] ?? [];
           const isCurrent = state.players[state.currentPlayerIndex]?.id === opp.id;
           return (
