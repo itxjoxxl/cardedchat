@@ -25,7 +25,7 @@ function PageSpinner() {
 function AnimatedRoutes() {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
         <Route path="/lobby/:gameId" element={<LobbyPage />} />
@@ -38,25 +38,24 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
-  const { profile, isSetupComplete, initProfile } = useProfileStore();
+  const { isSetupComplete, initProfile } = useProfileStore();
 
   useEffect(() => {
     initProfile();
   }, [initProfile]);
-
-  // Render profile setup until the user has a name + avatar
-  if (!isSetupComplete || !profile) {
-    return <ProfileSetup />;
-  }
 
   return (
     <BrowserRouter>
       {/* Global toast overlay */}
       <Toast />
 
-      <Suspense fallback={<PageSpinner />}>
-        <AnimatedRoutes />
-      </Suspense>
+      {isSetupComplete ? (
+        <Suspense fallback={<PageSpinner />}>
+          <AnimatedRoutes />
+        </Suspense>
+      ) : (
+        <ProfileSetup />
+      )}
     </BrowserRouter>
   );
 }
