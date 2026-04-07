@@ -281,9 +281,17 @@ export function useGame(_gameId?: string) {
   ]);
 
   const restart = useCallback(() => {
-    if (!state) return;
-    storeStartGame(state.gameId, state.players);
-  }, [state, storeStartGame]);
+    if (!state || !engineRef.current) return;
+    // Directly create a fresh initial state. Do NOT go through storeStartGame() because
+    // that sets status:'idle' and the engine useEffect won't re-fire (gameId unchanged),
+    // leaving the game frozen on a blank idle state forever.
+    try {
+      const fresh = engineRef.current.createInitialState(state.players, {});
+      _setState(fresh);
+    } catch (err) {
+      console.error('[useGame] restart failed:', err);
+    }
+  }, [state, _setState]);
 
   return {
     state,
