@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useProfileStore } from '@/store/profileStore';
 import { cn } from '@/lib/cn';
 
@@ -11,6 +11,7 @@ interface AppShellProps {
 
 export default function AppShell({ children, showBack, title, className }: AppShellProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile } = useProfileStore();
 
   return (
@@ -49,13 +50,31 @@ export default function AppShell({ children, showBack, title, className }: AppSh
       {/* Bottom nav */}
       <div className="flex-shrink-0 safe-bottom border-t border-white/5 bg-felt-dark/80">
         <div className="flex">
-          <Link to="/" className="flex-1 flex flex-col items-center py-3 text-white/60 hover:text-white transition-colors">
+          <Link
+            to="/"
+            className={cn(
+              'flex-1 flex flex-col items-center py-3 transition-colors',
+              location.pathname === '/' ? 'text-yellow-400' : 'text-white/60 hover:text-white',
+            )}
+          >
             <span className="text-xl">🃏</span>
             <span className="text-[10px] font-ui mt-0.5">Games</span>
+            {location.pathname === '/' && (
+              <span className="w-1 h-1 rounded-full bg-yellow-400 mt-0.5" />
+            )}
           </Link>
-          <Link to="/profile" className="flex-1 flex flex-col items-center py-3 text-white/60 hover:text-white transition-colors">
+          <Link
+            to="/profile"
+            className={cn(
+              'flex-1 flex flex-col items-center py-3 transition-colors',
+              location.pathname === '/profile' ? 'text-yellow-400' : 'text-white/60 hover:text-white',
+            )}
+          >
             <span className="text-xl">👤</span>
             <span className="text-[10px] font-ui mt-0.5">Profile</span>
+            {location.pathname === '/profile' && (
+              <span className="w-1 h-1 rounded-full bg-yellow-400 mt-0.5" />
+            )}
           </Link>
         </div>
       </div>

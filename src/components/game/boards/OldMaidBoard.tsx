@@ -91,6 +91,7 @@ export default function OldMaidBoard({ gameId }: BoardProps) {
         visible={gameOver}
         winners={winners}
         isLocalPlayerWinner={isWinner}
+        scores={state.scores}
         players={state.players}
         onPlayAgain={restart}
         onExit={() => navigate('/')}

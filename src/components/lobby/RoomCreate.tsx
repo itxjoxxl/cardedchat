@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useProfileStore } from '@/store/profileStore';
 import { useRoomStore } from '@/store/roomStore';
 import { createRoom, generateRoomCode } from '@/lib/realtime';
+import { getGame } from '@/games/registry';
 import { useUIStore } from '@/store/uiStore';
 import Button from '@/components/ui/Button';
-import { cn } from '@/lib/cn';
 
 interface RoomCreateProps {
   gameId: string;
@@ -18,13 +18,16 @@ export default function RoomCreate({ gameId, onCreated }: RoomCreateProps) {
   const [loading, setLoading] = useState(false);
   const [code, setCode] = useState<string | null>(null);
 
+  const game = getGame(gameId);
+  const maxPlayers = game?.maxPlayers ?? 6;
+
   async function handleCreate() {
     if (!profile) return;
     setLoading(true);
     try {
       const roomCode = generateRoomCode();
       const hostPlayer = { id: profile.id, name: profile.name, avatar: profile.avatar, isBot: false, isLocal: true, seatIndex: 0 };
-      const room = await createRoom(gameId, hostPlayer, 6);
+      const room = await createRoom(gameId, hostPlayer, maxPlayers);
       if (room) {
         setRoom(room);
         setCode(room.code);

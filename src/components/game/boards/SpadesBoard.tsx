@@ -53,7 +53,7 @@ export default function SpadesBoard({ gameId }: BoardProps) {
 
       {/* Opponents */}
       <div className="flex justify-around pt-20 pb-2 px-4">
-        {opponents.slice(0, 3).map((opp: any) => {
+        {opponents.map((opp: any) => {
           const isCurrent = state.players[state.currentPlayerIndex]?.id === opp.id;
           const oppBid = bids[opp.id];
           const oppTricks = tricksTaken[opp.id] ?? 0;

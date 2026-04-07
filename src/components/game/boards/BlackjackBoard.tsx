@@ -27,10 +27,16 @@ export default function BlackjackBoard({ gameId }: BoardProps) {
   const activeHand = bjPlayer?.hands?.[bjPlayer?.activeHandIndex ?? 0];
   const handCards = activeHand?.cards ?? [];
   const chips = bjPlayer?.chips ?? 1000;
-  const handValue = handCards.reduce((sum: number, c: any) => {
-    const v = ['J','Q','K'].includes(c.rank) ? 10 : c.rank === 'A' ? 11 : parseInt(c.rank);
-    return sum + v;
-  }, 0);
+  const handValue = (() => {
+    let sum = 0, aces = 0;
+    for (const c of handCards) {
+      if (['J', 'Q', 'K'].includes(c.rank)) sum += 10;
+      else if (c.rank === 'A') { sum += 11; aces++; }
+      else sum += parseInt(c.rank);
+    }
+    while (sum > 21 && aces > 0) { sum -= 10; aces--; }
+    return sum;
+  })();
 
   const winners = state.winners.map((wid: string) => state.players.find((p: any) => p.id === wid)).filter(Boolean) as any[];
   const isWinner = localPlayer ? state.winners.includes(localPlayer.id) : false;
@@ -79,7 +85,9 @@ export default function BlackjackBoard({ gameId }: BoardProps) {
       {/* Player hand */}
       <div className="flex flex-col items-center py-4 gap-3">
         <div className="text-white/50 text-xs font-ui uppercase tracking-widest">
-          Your Hand {handCards.length > 0 && <span className="text-yellow-400 font-bold"> — {Math.min(handValue, 21)}</span>}
+          Your Hand {handCards.length > 0 && (
+          <span className={cn('font-bold', handValue > 21 ? 'text-red-400' : 'text-yellow-400')}> — {handValue}{handValue > 21 ? ' BUST' : ''}</span>
+        )}
         </div>
         <div className="flex gap-2 justify-center flex-wrap px-4">
           {handCards.map((card: any) => (

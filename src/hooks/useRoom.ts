@@ -32,9 +32,8 @@ export function useRoom(code?: string) {
       },
 
       onGameAction({ action }) {
-        // Route incoming actions through the game store's apply path.
-        // useGame will detect the state change via subscription.
-        gameStore.applyAction(action);
+        // Queue the action; useGame drains it through the loaded engine.
+        gameStore.queueRemoteAction(action);
       },
 
       onGameStarted({ seed, playerOrder }) {
